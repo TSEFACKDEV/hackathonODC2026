@@ -17,7 +17,7 @@ export default function NotFound() {
         </div>
 
         <h1 className="text-2xl font-display font-bold text-gray-900 mb-3">
-          Cette page s'est perdue dans la nature
+          Cette page n'a pas été retrouvé
         </h1>
         <p className="text-gray-500 text-sm mb-8 leading-relaxed">
           La page que vous cherchez n'existe pas ou a été déplacée.
