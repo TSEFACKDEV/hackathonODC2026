@@ -1,0 +1,216 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum Role {
+  USER
+  AGENT
+  ADMIN
+}
+
+enum SignalStatus {
+  PENDING
+  IN_PROGRESS
+  COLLECTED
+  REJECTED
+}
+
+enum ActivityStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TipType {
+  COMPOSTING
+  RECYCLING
+  UPCYCLING
+  GENERAL
+}
+
+enum CollectionStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  phone         String?
+  avatar        String?
+  role          Role      @default(USER)
+  points        Int       @default(0)
+  credits       Int       @default(0)
+  totalPoints   Int       @default(0)
+  isVerified    Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  resetToken    String?
+  resetExpiry   DateTime?
+  verifyToken   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  signals       Signal[]
+  activities    Activity[]
+  collections   Collection[]  @relation("AgentCollections")
+  tips          Tip[]
+  notifications Notification[]
+  creditHistory CreditHistory[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Signal {
+  id          String       @id @default(cuid())
+  userId      String
+  description String       @db.Text
+  imageUrl    String
+  latitude    Float
+  longitude   Float
+  address     String?
+  severity    Int          @default(1)  // 1=faible, 2=moyen, 3=grave
+  status      SignalStatus @default(PENDING)
+  collectedAt DateTime?
+  agentNote   String?      @db.Text
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  collection  CollectionPoint[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([latitude, longitude])
+}
+
+model Collection {
+  id          String           @id @default(cuid())
+  agentId     String
+  title       String
+  description String?          @db.Text
+  date        DateTime
+  status      CollectionStatus @default(PLANNED)
+  totalPoints Int              @default(0)
+  distance    Float?           // en km
+  duration    Int?             // en minutes estimées
+  carbonSaved Float?           // kg CO2 économisés
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  agent       User             @relation("AgentCollections", fields: [agentId], references: [id])
+  points      CollectionPoint[]
+
+  @@index([agentId])
+  @@index([date])
+  @@index([status])
+}
+
+model CollectionPoint {
+  id           String     @id @default(cuid())
+  collectionId String
+  signalId     String?
+  latitude     Float
+  longitude    Float
+  address      String?
+  order        Int        // ordre de passage
+  isVisited    Boolean    @default(false)
+  visitedAt    DateTime?
+  createdAt    DateTime   @default(now())
+
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  signal       Signal?    @relation(fields: [signalId], references: [id], onDelete: SetNull)
+
+  @@index([collectionId])
+}
+
+model Activity {
+  id          String         @id @default(cuid())
+  userId      String
+  title       String
+  description String         @db.Text
+  mediaUrl    String?        // image ou video
+  mediaType   String?        // "image" | "video"
+  tags        String?        // JSON array de tags
+  score       Int            @default(0)  // score attribué
+  status      ActivityStatus @default(PENDING)
+  adminNote   String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Tip {
+  id          String   @id @default(cuid())
+  adminId     String
+  title       String
+  content     String   @db.LongText
+  imageUrl    String?
+  type        TipType  @default(GENERAL)
+  isPublished Boolean  @default(true)
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  admin       User     @relation(fields: [adminId], references: [id])
+
+  @@index([adminId])
+  @@index([type])
+}
+
+model Schedule {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  zone        String   // quartier/zone
+  frequency   String   // "WEEKLY", "BIWEEKLY", "MONTHLY"
+  dayOfWeek   Int?     // 0=Lundi...6=Dimanche
+  timeSlot    String   // "08:00-12:00"
+  isActive    Boolean  @default(true)
+  pdfUrl      String?  // lien vers le PDF téléchargeable
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([zone])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String   @db.Text
+  type      String   // "signal", "activity", "reward", "system"
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model CreditHistory {
+  id          String   @id @default(cuid())
+  userId      String
+  amount      Int
+  type        String   // "EARN" | "SPEND"
+  description String
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
