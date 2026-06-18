@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { logout } from "@/store/slices/authSlice";
-import { MdMenu, MdClose, MdLogout, MdPerson, MdDashboard } from "react-icons/md";
+import { MdMenu, MdClose, MdLogout, MdPerson, MdDashboard, MdEco, MdEmojiEvents } from "react-icons/md";
 
 const navLinks = [
   { href: "/", label: "Accueil" },
@@ -14,6 +14,7 @@ const navLinks = [
   { href: "/planning", label: "Planning" },
   { href: "/signals", label: "Signalement" },
   { href: "/activities", label: "Activités" },
+  { href: "/faq", label: "FAQ" },
 ];
 
 export default function Header() {
@@ -42,7 +43,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
             <div className="w-9 h-9 gradient-primary rounded-xl flex items-center justify-center shadow-sm">
-              <span className="text-lg">🌿</span>
+              <MdEco size={20} className="text-white" />
             </div>
             <span className="font-display font-bold text-xl text-primary-700">EcoTrack</span>
           </Link>
@@ -82,7 +83,7 @@ export default function Header() {
                         <p className="font-semibold text-sm text-gray-800 truncate">{user.name}</p>
                         <p className="text-xs text-gray-400 truncate">{user.email}</p>
                         <div className="flex items-center gap-2 mt-1.5">
-                          <span className="badge-green text-xs">🏆 {user.points} pts</span>
+                          <span className="badge-green text-xs"><MdEmojiEvents className="inline mr-1" size={14}/> {user.points} pts</span>
                         </div>
                       </div>
                       {[

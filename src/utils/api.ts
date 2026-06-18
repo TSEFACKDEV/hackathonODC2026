@@ -19,6 +19,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("access_token");
       localStorage.removeItem("user");
+      document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; sameSite=Strict";
       window.location.href = "/login";
     }
     return Promise.reject(error);

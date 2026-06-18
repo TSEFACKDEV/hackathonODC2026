@@ -3,6 +3,11 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { signAccessToken } from "@/lib/jwt";
 
+const buildAuthCookie = (token: string) => {
+  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+  return `access_token=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400${secure}`;
+};
+
 export async function POST(req: NextRequest) {
   try {
     const { email, password } = await req.json();
@@ -25,9 +30,15 @@ export async function POST(req: NextRequest) {
 
     const { password: _, resetToken: __, verifyToken: ___, ...safeUser } = user;
 
-    return Response.json({
+    return new Response(JSON.stringify({
       message: "Connexion réussie",
       data: { user: safeUser, token },
+    }), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Set-Cookie": buildAuthCookie(token),
+      },
     });
 
   } catch (error) {

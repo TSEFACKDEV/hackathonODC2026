@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { RootState } from "@/store";
 import { setNotifications, markAllRead } from "@/store/slices/notificationSlice";
 import api from "@/utils/api";
-import { MdNotifications, MdClose } from "react-icons/md";
+import { MdNotifications, MdClose, MdEco } from "react-icons/md";
 
 export default function MainHeader() {
   const dispatch = useDispatch();
@@ -29,7 +29,7 @@ export default function MainHeader() {
     <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 md:px-6 py-4">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         <div className="lg:hidden flex items-center gap-2">
-          <span className="text-2xl">🌿</span>
+          <MdEco size={24} className="text-primary-700" />
           <span className="font-display font-bold text-primary-700">EcoTrack</span>
         </div>
 

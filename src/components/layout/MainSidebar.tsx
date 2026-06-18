@@ -8,7 +8,7 @@ import { RootState } from "@/store";
 import { logout } from "@/store/slices/authSlice";
 import {
   MdDashboard, MdReportProblem, MdCalendarToday, MdTipsAndUpdates,
-  MdEco, MdPerson, MdLogout, MdMap,
+  MdEco, MdEmojiEvents, MdPerson, MdLogout, MdMap,
 } from "react-icons/md";
 
 const navItems = [
@@ -31,7 +31,7 @@ export default function MainSidebar() {
       <div className="p-6 border-b border-gray-100">
         <Link href="/dashboard" className="flex items-center gap-3">
           <div className="w-10 h-10 gradient-green rounded-xl flex items-center justify-center">
-            <span className="text-xl">🌿</span>
+            <MdEco size={20} className="text-white" />
           </div>
           <div>
             <h1 className="text-lg font-display font-bold text-primary-700">EcoTrack</h1>
@@ -78,7 +78,7 @@ export default function MainSidebar() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-gray-800 truncate">{user?.name}</p>
-            <p className="text-xs text-primary-600">🏆 {user?.points} pts</p>
+            <p className="text-xs text-primary-600"><MdEmojiEvents className="inline mr-1" size={14}/> {user?.points} pts</p>
           </div>
         </div>
         <button

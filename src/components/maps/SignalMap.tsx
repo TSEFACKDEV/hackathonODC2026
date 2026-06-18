@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaf
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Signal } from "@/types";
+import { MdLocationOn } from "react-icons/md";
 
 // Fix icônes Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -82,7 +83,7 @@ export default function SignalMap({
       {/* Position sélectionnée */}
       {selectedPosition && (
         <Marker position={selectedPosition}>
-          <Popup>📍 Votre position sélectionnée</Popup>
+          <Popup><MdLocationOn className="inline mr-1" size={14}/> Votre position sélectionnée</Popup>
         </Marker>
       )}
 

@@ -2,6 +2,7 @@
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { MdCollectionsBookmark } from "react-icons/md";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -32,7 +33,7 @@ export default function CollectionMap({ collections, routePoints }: Props) {
             <div className="text-sm">
               <p className="font-bold text-primary-700">Arrêt #{p.order || i+1}</p>
               {p.address && <p className="text-gray-500">{p.address}</p>}
-              {p.collectionTitle && <p className="text-xs text-gray-400 mt-1">📋 {p.collectionTitle}</p>}
+              {p.collectionTitle && <p className="text-xs text-gray-400 mt-1"><MdCollectionsBookmark className="inline mr-1" size={14}/> {p.collectionTitle}</p>}
             </div>
           </Popup>
         </Marker>

@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import { MdChatBubbleOutline, MdStar } from "react-icons/md";
 
 const testimonials = [
   { name: "Marie Ngo", role: "Citoyenne, Douala", text: "Grâce à EcoTrack, j'ai signalé 12 dépôts dans mon quartier. Ils ont tous été collectés en moins de 48h. Mon quartier est méconnaissable !", rating: 5, avatar: "MN" },
@@ -12,7 +13,7 @@ export default function TestimonialsSection() {
     <section className="section bg-white">
       <div className="container-custom">
         <motion.div initial={{ opacity:0,y:20 }} whileInView={{ opacity:1,y:0 }} viewport={{ once:true }} className="text-center mb-12">
-          <span className="badge-green text-sm px-4 py-1.5 mb-4 inline-block">💬 Témoignages</span>
+          <span className="badge-green text-sm px-4 py-1.5 mb-4 inline-flex items-center gap-2"><MdChatBubbleOutline size={16}/> Témoignages</span>
           <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-900">Ils parlent d'EcoTrack</h2>
         </motion.div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -26,7 +27,7 @@ export default function TestimonialsSection() {
               className="card p-6"
             >
               <div className="flex gap-0.5 mb-4">
-                {[...Array(t.rating)].map((_, j) => <span key={j} className="text-yellow-400 text-lg">★</span>)}
+                {[...Array(t.rating)].map((_, j) => <MdStar key={j} className="text-yellow-400" size={18}/>)}
               </div>
               <p className="text-gray-600 text-sm leading-relaxed mb-5 italic">"{t.text}"</p>
               <div className="flex items-center gap-3">

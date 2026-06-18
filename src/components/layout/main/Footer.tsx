@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
+import { MdEmail, MdPhone, MdLocationOn, MdEco, MdFavorite } from "react-icons/md";
 import { FaFacebook, FaTwitter, FaWhatsapp, FaInstagram } from "react-icons/fa";
 
 const links = {
@@ -31,7 +31,7 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2.5 mb-4">
               <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center">
-                <span className="text-xl">🌿</span>
+                <MdEco size={20} className="text-white" />
               </div>
               <span className="font-display font-bold text-2xl">EcoTrack</span>
             </Link>
@@ -73,7 +73,7 @@ export default function Footer() {
 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-6 text-xs text-primary-400">
           <p>© {new Date().getFullYear()} EcoTrack. Tous droits réservés.</p>
-          <p>Fait avec 💚 pour l'environnement camerounais</p>
+          <p className="flex items-center gap-1">Fait avec <MdFavorite size={14} className="text-red-400"/> pour l'environnement camerounais</p>
         </div>
       </div>
     </footer>

@@ -5,6 +5,11 @@ import { signAccessToken } from "@/lib/jwt";
 import { sendVerificationEmail } from "@/lib/mailer";
 import crypto from "crypto";
 
+const buildAuthCookie = (token: string) => {
+  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+  return `access_token=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400${secure}`;
+};
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -41,10 +46,16 @@ export async function POST(req: NextRequest) {
 
     const token = signAccessToken({ userId: user.id, email: user.email, role: user.role });
 
-    return Response.json({
+    return new Response(JSON.stringify({
       message: "Compte créé ! Vérifiez votre email.",
       data: { user, token },
-    }, { status: 201 });
+    }), {
+      status: 201,
+      headers: {
+        "Content-Type": "application/json",
+        "Set-Cookie": buildAuthCookie(token),
+      },
+    });
 
   } catch (error) {
     console.error("Register error:", error);
