@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { MdArrowForward, MdPlayCircle, MdChevronLeft, MdChevronRight, MdLocationOn, MdEmojiEvents } from "react-icons/md";
+import { MdArrowForward, MdChevronLeft, MdChevronRight, MdLocationOn, MdCalendarMonth, MdEmojiEvents } from "react-icons/md";
 
 const slides = [
   {
@@ -15,7 +15,7 @@ const slides = [
     gradient: "from-primary-900/90 via-primary-800/70 to-transparent",
     btnPrimary: { label: "Signaler un dépôt", href: "/signals" },
     btnSecondary: { label: "Voir la carte", href: "/signals" },
-    badge: (<><MdLocationOn className="inline mr-1"/>+2 400 signalements traités</>),
+    badge: { icon: <MdLocationOn size={18}/>, label: "+2 400 signalements traités" },
   },
   {
     id: 2,
@@ -26,7 +26,7 @@ const slides = [
     gradient: "from-emerald-900/90 via-emerald-800/70 to-transparent",
     btnPrimary: { label: "Voir le planning", href: "/planning" },
     btnSecondary: { label: "Mon quartier", href: "/planning" },
-    badge: "📅 Douala & Yaoundé couverts",
+    badge: { icon: <MdCalendarMonth size={18}/>, label: "Douala & Yaoundé couverts" },
   },
   {
     id: 3,
@@ -37,7 +37,7 @@ const slides = [
     gradient: "from-teal-900/90 via-teal-800/70 to-transparent",
     btnPrimary: { label: "Rejoindre la communauté", href: "/register" },
     btnSecondary: { label: "Découvrir les astuces", href: "/tips" },
-    badge: (<><MdEmojiEvents className="inline mr-1"/>+1 200 utilisateurs actifs</>),
+    badge: { icon: <MdEmojiEvents size={18}/>, label: "+1 200 utilisateurs actifs" },
   },
 ];
 
@@ -76,12 +76,12 @@ export default function HeroSection() {
           className="absolute inset-0"
         >
           <Image src={slide.image} alt={slide.title} fill className="object-cover" priority={current === 0} />
-          <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient}`}/>
+          <div className={`absolute inset-0 bg-linear-to-r ${slide.gradient}`}/>
         </motion.div>
       </AnimatePresence>
 
       {/* Content */}
-      <div className="container-custom relative z-10 py-24 md:py-0">
+      <div className="relative z-10 py-24 md:py-0 pl-4 md:pl-8 lg:pl-16">
         <div className="max-w-2xl">
           <AnimatePresence mode="wait">
             <motion.div
@@ -111,24 +111,28 @@ export default function HeroSection() {
               </p>
 
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-white/90 text-sm font-medium border border-white/20">
-                {slide.badge}
+              <div className="inline-flex items-center gap-3 rounded-full bg-white/10 backdrop-blur-sm px-4 py-2 text-white/90 text-sm font-medium border border-white/20">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white">
+                  {slide.badge.icon}
+                </span>
+                <span>{slide.badge.label}</span>
               </div>
 
               {/* Buttons */}
               <div className="flex flex-wrap gap-3 pt-2">
-                <Link href={slide.btnPrimary.href}>
-                  <motion.button whileTap={{ scale: 0.97 }}
-                    className="btn-lg btn-primary shadow-lg shadow-primary-900/30">
+                <Link href={slide.btnPrimary.href} className="inline-flex">
+                  <motion.span whileTap={{ scale: 0.97 }} className="btn-lg btn-primary shadow-lg shadow-primary-900/30 inline-flex items-center gap-2">
                     {slide.btnPrimary.label}
-                    <MdArrowForward size={18}/>
-                  </motion.button>
+                    <MdArrowForward size={18} />
+                  </motion.span>
                 </Link>
-                <Link href={slide.btnSecondary.href}>
-                  <motion.button whileTap={{ scale: 0.97 }}
-                    className="btn-lg bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm btn">
+                <Link href={slide.btnSecondary.href} className="inline-flex">
+                  <motion.span
+                    whileTap={{ scale: 0.97 }}
+                    className="btn-lg inline-flex items-center justify-center rounded-xl bg-white/15 text-white border border-white/25 hover:bg-white/30 backdrop-blur-sm px-6 py-3"
+                  >
                     {slide.btnSecondary.label}
-                  </motion.button>
+                  </motion.span>
                 </Link>
               </div>
             </motion.div>
@@ -136,11 +140,20 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Contrôles */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-4">
-        <button onClick={prev} className="w-9 h-9 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-colors border border-white/30">
-          <MdChevronLeft size={20}/>
+      {/* Navigation arrows on left and right, vertically centered */}
+      <div className="absolute inset-y-0 left-4 z-20 flex items-center">
+        <button onClick={prev} aria-label="Précédent" className="w-10 h-10 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-colors border border-white/30">
+          <MdChevronLeft size={22} />
         </button>
+      </div>
+      <div className="absolute inset-y-0 right-4 z-20 flex items-center">
+        <button onClick={next} aria-label="Suivant" className="w-10 h-10 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-colors border border-white/30">
+          <MdChevronRight size={22} />
+        </button>
+      </div>
+
+      {/* Slide indicators (dots) centered near bottom */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3">
         <div className="flex gap-2">
           {slides.map((_, i) => (
             <button key={i} onClick={() => goTo(i)}
@@ -148,9 +161,6 @@ export default function HeroSection() {
             />
           ))}
         </div>
-        <button onClick={next} className="w-9 h-9 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-colors border border-white/30">
-          <MdChevronRight size={20}/>
-        </button>
       </div>
 
       {/* Progress bar */}

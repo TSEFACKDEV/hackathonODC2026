@@ -21,9 +21,15 @@ const DOUALA: [number,number] = [4.0511, 9.7679];
 interface Props {
   collections: any[];
   routePoints: any[];
+  selectedCollectionId?: string | null;
+  highlightedZone?: string | null;
 }
 
-export default function CollectionMap({ collections, routePoints }: Props) {
+export default function CollectionMap({ collections, routePoints, selectedCollectionId, highlightedZone }: Props) {
+  // palette of soft colors
+  const palette = ["#16a34a", "#0284c7", "#7c3aed", "#f97316", "#e11d48", "#0891b2"];
+  const getColor = (idx: number) => palette[idx % palette.length];
+
   return (
     <MapContainer center={DOUALA} zoom={13} style={{ height:"100%",width:"100%" }}>
       <TileLayer attribution='© OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
@@ -39,15 +45,21 @@ export default function CollectionMap({ collections, routePoints }: Props) {
         </Marker>
       ))}
       {/* Tracer la route */}
-      {collections.map((col) =>
+      {collections.map((col, idx) =>
         col.points?.length > 1 ? (
           <Polyline
             key={col.id}
             positions={col.points.sort((a:any,b:any)=>a.order-b.order).map((p:any)=>[p.latitude,p.longitude])}
-            color="#16a34a"
-            weight={3}
-            dashArray="6 4"
-            opacity={0.8}
+            color={
+              selectedCollectionId && selectedCollectionId === col.id
+                ? getColor(idx)
+                : highlightedZone && col.zone && highlightedZone === col.zone
+                  ? getColor(idx)
+                  : getColor(idx)
+            }
+            weight={selectedCollectionId === col.id ? 6 : 3}
+            dashArray={selectedCollectionId === col.id ? undefined : "6 4"}
+            opacity={selectedCollectionId === col.id ? 1 : 0.85}
           />
         ) : null
       )}

@@ -4,7 +4,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
-import { MdAdd, MdEdit, MdDelete, MdCalendarToday, MdAccessTime } from "react-icons/md";
+import { MdAdd, MdEdit, MdDelete, MdCalendarToday, MdAccessTime, MdLocationOn } from "react-icons/md";
 import api from "@/utils/api";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -63,7 +63,7 @@ export default function PlanningManagerPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-display font-bold text-gray-900">Gestion du Planning 📅</h2>
+          <h2 className="text-2xl font-display font-bold text-gray-900 flex items-center gap-2"><MdCalendarToday size={24}/>Gestion du Planning</h2>
           <p className="text-gray-500 text-sm">{schedules.length} zone(s) configurée(s)</p>
         </div>
         <Button onClick={openCreate} icon={<MdAdd size={18}/>}>Nouveau planning</Button>
@@ -74,7 +74,7 @@ export default function PlanningManagerPage() {
           {[...Array(4)].map((_,i) => <div key={i} className="card h-36 animate-pulse bg-gray-100"/>)}
         </div>
       ) : schedules.length === 0 ? (
-        <EmptyState icon="📅" title="Aucun planning configuré">
+        <EmptyState icon={<MdCalendarToday size={32}/>} title="Aucun planning configuré">
           <Button onClick={openCreate} icon={<MdAdd size={18}/>}>Créer un planning</Button>
         </EmptyState>
       ) : (
@@ -85,7 +85,7 @@ export default function PlanningManagerPage() {
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <h3 className="font-display font-bold text-gray-900">{s.title}</h3>
-                  <p className="text-xs text-primary-600 font-semibold mt-0.5">📍 {s.zone}</p>
+                  <p className="text-xs text-primary-600 font-semibold mt-0.5"><MdLocationOn className="inline mr-1" size={14}/> {s.zone}</p>
                 </div>
                 <span className={`badge ${s.isActive?"badge-green":"badge-gray"}`}>{s.isActive?"Actif":"Inactif"}</span>
               </div>

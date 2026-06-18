@@ -55,7 +55,7 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         className="gradient-green rounded-2xl p-6 text-white overflow-hidden relative"
       >
-        <div className="absolute top-0 right-0 opacity-10 text-[10rem] leading-none">🌿</div>
+        <div className="absolute top-0 right-0 opacity-10 text-[10rem] leading-none"> </div>
         <h1 className="text-2xl font-display font-bold">
           {greetingTime()}, {user?.name?.split(" ")[0]} !
         </h1>
@@ -89,10 +89,10 @@ export default function DashboardPage() {
         <h2 className="text-lg font-display font-bold text-gray-800 mb-3">Actions rapides</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { href: "/signals?new=1", label: "Signaler un dépôt", icon: "📍", color: "bg-red-50 border-red-200 text-red-700" },
-            { href: "/schedule", label: "Voir le planning", icon: "📅", color: "bg-blue-50 border-blue-200 text-blue-700" },
-            { href: "/tips", label: "Astuces recyclage", icon: "♻️", color: "bg-primary-50 border-primary-200 text-primary-700" },
-            { href: "/activities?new=1", label: "Publier activité", icon: "🌱", color: "bg-emerald-50 border-emerald-200 text-emerald-700" },
+            { href: "/signals?new=1", label: "Signaler un dépôt", icon: <MdPlace size={24} className="text-red-600" />, color: "bg-red-50 border-red-200 text-red-700" },
+            { href: "/schedule", label: "Voir le planning", icon: <MdCalendarToday size={24} className="text-blue-600" />, color: "bg-blue-50 border-blue-200 text-blue-700" },
+            { href: "/tips", label: "Astuces recyclage", icon: <MdTipsAndUpdates size={24} className="text-primary-600" />, color: "bg-primary-50 border-primary-200 text-primary-700" },
+            { href: "/activities?new=1", label: "Publier activité", icon: <MdEco size={24} className="text-emerald-600" />, color: "bg-emerald-50 border-emerald-200 text-emerald-700" },
           ].map((action, i) => (
             <Link key={i} href={action.href}>
               <motion.div

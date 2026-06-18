@@ -13,7 +13,6 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
-      <StatsSection />
       <FeaturesSection />
       <HowItWorksSection />
       <TipsPreviewSection />

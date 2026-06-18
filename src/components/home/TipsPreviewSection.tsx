@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import api from "@/utils/api";
+import Button from "@/components/ui/Button";
 import { MdArrowForward, MdNature, MdAutorenew, MdPalette, MdLightbulb } from "react-icons/md";
 
 const typeColors: Record<string, string> = {
@@ -37,15 +38,18 @@ export default function TipsPreviewSection() {
       <div className="container-custom">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
           <div>
-            <span className="badge-green text-sm px-4 py-1.5 mb-3 inline-block">♻️ Astuces</span>
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-900">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary-600/10 px-4 py-2 text-sm font-semibold text-primary-700">
+              <MdLightbulb size={18} />
+              Astuces
+            </div>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-900 mt-4">
               Apprenez à recycler mieux
             </h2>
           </div>
           <Link href="/tips">
-            <button className="btn-md btn-outline shrink-0">
-              Voir tout <MdArrowForward size={18}/>
-            </button>
+            <Button variant="outline" size="md" iconRight={<MdArrowForward size={18} />}>
+              Voir tout
+            </Button>
           </Link>
         </div>
 
@@ -68,21 +72,24 @@ export default function TipsPreviewSection() {
                 whileInView={{ opacity:1, y:0 }}
                 viewport={{ once:true }}
                 transition={{ delay: i * 0.1 }}
-                className="card-hover overflow-hidden"
+                className="card overflow-hidden border border-gray-100 shadow-sm transition-shadow hover:shadow-lg"
               >
-                <div className="h-44 bg-gradient-to-br from-primary-100 to-emerald-100 relative overflow-hidden">
+                <div className="flex h-44 items-center justify-center bg-gradient-to-br from-primary-100 to-emerald-100">
                   {tip.imageUrl ? (
-                    <img src={tip.imageUrl} alt={tip.title} className="w-full h-full object-cover"/>
+                    <img src={tip.imageUrl} alt={tip.title} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-6xl">
-                          {typeIcons[tip.type] || <MdLightbulb/>}
+                    <div className="flex items-center justify-center text-4xl text-primary-700">
+                      {typeIcons[tip.type] || <MdLightbulb />}
                     </div>
                   )}
                 </div>
-                <div className="p-5">
-                  <span className={typeColors[tip.type] || "badge-gray"}>{typeIcons[tip.type]} {typeLabels[tip.type] || tip.type}</span>
+                <div className="p-5 space-y-3">
+                  <div className={`inline-flex items-center gap-2 ${typeColors[tip.type] || "badge-gray"}`}>
+                    {typeIcons[tip.type]}
+                    <span>{typeLabels[tip.type] || tip.type}</span>
+                  </div>
                   <h3 className="font-display font-bold text-gray-900 mt-2 mb-1 line-clamp-2">{tip.title}</h3>
-                  <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">{tip.content}</p>
+                  <p className="text-sm text-gray-500 line-clamp-3 leading-relaxed">{tip.content}</p>
                 </div>
               </motion.article>
             ))}

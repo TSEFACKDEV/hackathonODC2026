@@ -5,7 +5,7 @@ import { MdLocationOn, MdMap, MdAutorenew, MdEmojiEvents, MdNature, MdBarChart }
 
 const features = [
   {
-    icon: <MdLocationOn/>,
+    icon: <MdLocationOn />,
     title: "Signalement en temps réel",
     description: "Signalez et géolocalisez les dépôts sauvages avec photo. Gagnez 10 points par signalement validé.",
     href: "/signals",
@@ -15,7 +15,7 @@ const features = [
     iconBg: "bg-red-100",
   },
   {
-    icon: <MdMap/>,
+    icon: <MdMap />,
     title: "Itinéraires optimisés",
     description: "Les agents de collecte utilisent des algorithmes pour calculer le chemin le plus court et réduire le CO₂.",
     href: "/planning",
@@ -25,7 +25,7 @@ const features = [
     iconBg: "bg-blue-100",
   },
   {
-    icon: <MdAutorenew/>,
+    icon: <MdAutorenew />,
     title: "Astuces & Recyclage",
     description: "Compostage, upcycling, tri sélectif… Apprenez à transformer vos déchets en ressources utiles.",
     href: "/tips",
@@ -35,7 +35,7 @@ const features = [
     iconBg: "bg-primary-100",
   },
   {
-    icon: <MdEmojiEvents/>,
+    icon: <MdEmojiEvents />,
     title: "Points & Récompenses",
     description: "Chaque action écologique vous rapporte des points convertibles en crédits de communication téléphonique.",
     href: "/register",
@@ -45,7 +45,7 @@ const features = [
     iconBg: "bg-yellow-100",
   },
   {
-    icon: <MdNature/>,
+    icon: <MdNature />,
     title: "Activités écologiques",
     description: "Partagez vos actions vertes, inspirez votre communauté et montez dans le classement éco-citoyen.",
     href: "/activities",
@@ -55,7 +55,7 @@ const features = [
     iconBg: "bg-teal-100",
   },
   {
-    icon: <MdBarChart/>,
+    icon: <MdBarChart />,
     title: "Tableau de bord admin",
     description: "Les administrateurs et agents disposent d'outils complets pour gérer les collectes et analyser les données.",
     href: "/admin",
@@ -68,38 +68,37 @@ const features = [
 
 export default function FeaturesSection() {
   return (
-    <section className="section bg-gray-50">
+    <section className="section bg-white">
       <div className="container-custom">
-        <motion.div initial={{ opacity:0,y:20 }} whileInView={{ opacity:1,y:0 }} viewport={{ once:true }} className="text-center mb-14">
-          <span className="badge-green text-sm px-4 py-1.5 mb-4 inline-block"><MdNature className="inline mr-2"/>Fonctionnalités</span>
-          <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-900 mb-4">
-            Tout ce dont vous avez besoin
-          </h2>
-          <p className="text-gray-500 text-lg max-w-xl mx-auto">
-            EcoTrack réunit citoyens, agents et administrateurs autour d'une mission commune : des villes plus propres.
-          </p>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <span className="badge-green text-sm px-4 py-1.5 mb-4 inline-block">
+            <MdNature className="inline mr-2" /> Fonctionnalités
+          </span>
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-900 mb-3">Tout ce dont vous avez besoin</h2>
+          <p className="text-gray-500 text-lg max-w-xl mx-auto">EcoTrack réunit citoyens, agents et administrateurs autour d'une mission commune : des villes plus propres.</p>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((f, i) => (
+          {features.map((feature, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              className={`card-hover p-6 bg-gradient-to-br ${f.color} border ${f.border}`}
+              transition={{ delay: i * 0.06 }}
+              className="card card-hover p-6"
             >
-              <div className={`w-14 h-14 ${f.iconBg} rounded-2xl flex items-center justify-center text-3xl mb-4`}>
-                {f.icon}
+              <div className={`w-14 h-14 ${feature.iconBg} rounded-2xl flex items-center justify-center text-2xl mb-4 text-primary-700`}>
+                {feature.icon}
               </div>
-              <h3 className="text-lg font-display font-bold text-gray-900 mb-2">{f.title}</h3>
-              <p className="text-sm text-gray-600 leading-relaxed mb-4">{f.description}</p>
-              <Link href={f.href}>
-                <button className="btn-sm btn-ghost text-primary-700 hover:bg-primary-100 px-0 font-semibold">
-                  {f.cta} →
-                </button>
-              </Link>
+              <h3 className="text-lg font-display font-bold text-gray-900 mb-2">{feature.title}</h3>
+              <p className="text-sm text-gray-600 leading-relaxed mb-4">{feature.description}</p>
+              <Link href={feature.href} className="btn btn-sm btn-ghost text-primary-700 hover:bg-primary-50 px-0 font-semibold">{feature.cta} →</Link>
             </motion.div>
           ))}
         </div>

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { RootState } from "@/store";
 import { logout } from "@/store/slices/authSlice";
-import { MdDashboard, MdMap, MdRoute, MdLogout, MdMenu, MdClose, MdChevronRight } from "react-icons/md";
+import { MdDashboard, MdMap, MdRoute, MdLogout, MdMenu, MdClose, MdChevronRight, MdEco } from "react-icons/md";
 
 const navItems = [
   { href: "/agent", label: "Dashboard", icon: <MdDashboard size={20}/>, exact: true },
@@ -38,7 +38,7 @@ export default function AgentLayout({ children }: { children: React.ReactNode })
         <div className="p-5 border-b border-primary-800">
           <Link href="/agent" className="flex items-center gap-3">
             <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center">
-              <span className="text-lg">🌿</span>
+              <MdEco size={20} />
             </div>
             <div>
               <p className="font-display font-bold text-white">EcoTrack</p>

@@ -10,7 +10,8 @@ export function useAuth(redirectTo = "/login") {
 
   useEffect(() => {
     if (!user || !token) {
-      router.replace(`${redirectTo}?redirect=${window.location.pathname}`);
+      const currentPath = window.location.pathname + window.location.search + window.location.hash;
+      router.replace(`${redirectTo}?redirect=${encodeURIComponent(currentPath)}`);
     }
   }, [user, token, router, redirectTo]);
 

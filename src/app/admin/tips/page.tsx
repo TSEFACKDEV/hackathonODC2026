@@ -4,7 +4,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
-import { MdAdd, MdEdit, MdDelete, MdImage } from "react-icons/md";
+import { MdAdd, MdEdit, MdDelete, MdImage, MdTipsAndUpdates, MdCheckCircle, MdPauseCircleOutline } from "react-icons/md";
 import api from "@/utils/api";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -12,10 +12,10 @@ import Input from "@/components/ui/Input";
 import EmptyState from "@/components/ui/EmptyState";
 
 const TYPES = [
-  { value:"COMPOSTING", label:"🌱 Compostage" },
-  { value:"RECYCLING", label:"♻️ Recyclage" },
-  { value:"UPCYCLING", label:"🎨 Upcycling" },
-  { value:"GENERAL", label:"💡 Général" },
+  { value:"COMPOSTING", label:"Compostage" },
+  { value:"RECYCLING", label:"Recyclage" },
+  { value:"UPCYCLING", label:"Upcycling" },
+  { value:"GENERAL", label:"Général" },
 ];
 
 export default function TipsManagerPage() {
@@ -86,7 +86,7 @@ export default function TipsManagerPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-display font-bold text-gray-900">Gestion des Astuces 💡</h2>
+          <h2 className="text-2xl font-display font-bold text-gray-900 flex items-center gap-2"><MdTipsAndUpdates size={24}/>Gestion des Astuces</h2>
           <p className="text-gray-500 text-sm">{tips.length} astuce(s) au total</p>
         </div>
         <Button onClick={openCreate} icon={<MdAdd size={18}/>}>Nouvelle astuce</Button>
@@ -97,7 +97,7 @@ export default function TipsManagerPage() {
           {[...Array(6)].map((_,i) => <div key={i} className="card h-48 animate-pulse bg-gray-100"/>)}
         </div>
       ) : tips.length === 0 ? (
-        <EmptyState icon="💡" title="Aucune astuce" description="Créez votre première astuce de recyclage.">
+        <EmptyState icon={<MdTipsAndUpdates size={32}/>} title="Aucune astuce" description="Créez votre première astuce de recyclage.">
           <Button onClick={openCreate} icon={<MdAdd size={18}/>}>Créer une astuce</Button>
         </EmptyState>
       ) : (
@@ -115,7 +115,7 @@ export default function TipsManagerPage() {
                 )}
                 <div className="absolute top-2 right-2">
                   <span className={tip.isPublished?"badge-green":"badge-gray"}>
-                    {tip.isPublished?"✅ Publié":"⏸ Brouillon"}
+                    {tip.isPublished ? <><MdCheckCircle className="inline mr-1" size={14}/>Publié</> : <><MdPauseCircleOutline className="inline mr-1" size={14}/>Brouillon</>}
                   </span>
                 </div>
               </div>

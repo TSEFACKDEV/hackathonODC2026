@@ -11,25 +11,67 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean;
 }
 
-const V = { primary:"btn-primary", secondary:"btn-secondary", outline:"btn-outline", ghost:"btn-ghost", white:"btn-white", danger:"btn-danger" };
-const S = { sm:"btn-sm", md:"btn-md", lg:"btn-lg" };
+const VARIANT_CLASSES = {
+  primary: "btn-primary",
+  secondary: "btn-secondary",
+  outline: "btn-outline",
+  ghost: "btn-ghost",
+  white: "btn-white",
+  danger: "btn-danger",
+};
+const SIZE_CLASSES = {
+  sm: "btn-sm",
+  md: "btn-md",
+  lg: "btn-lg",
+};
 
-export default function Button({ children, variant="primary", size="md", loading, icon, iconRight, fullWidth, className="", disabled, ...rest }: Props) {
+export default function Button({
+  children,
+  variant = "primary",
+  size = "md",
+  loading = false,
+  icon,
+  iconRight,
+  fullWidth = false,
+  className = "",
+  disabled = false,
+  type = "button",
+  ...rest
+}: Props) {
+  const isDisabled = disabled || loading;
+  const classNameList = [
+    "btn",
+    "rounded-lg",
+    SIZE_CLASSES[size],
+    VARIANT_CLASSES[variant],
+    fullWidth ? "w-full" : "",
+    isDisabled ? "opacity-70 cursor-not-allowed" : "hover:shadow-lg",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <motion.button
-      whileTap={{ scale: 0.97 }}
-      disabled={disabled || loading}
-      className={`${S[size]} ${V[variant]} ${fullWidth?"w-full":""} ${className}`}
+      type={type}
+      whileTap={!isDisabled ? { scale: 0.97 } : undefined}
+      disabled={isDisabled}
+      className={classNameList}
+      aria-busy={loading ? true : undefined}
       {...(rest as any)}
     >
       {loading ? (
-        <svg className="animate-spin h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-        </svg>
-      ) : icon && <span className="shrink-0">{icon}</span>}
-      <span>{children}</span>
-      {iconRight && !loading && <span className="shrink-0">{iconRight}</span>}
+        <span className="inline-flex items-center gap-3">
+          <span className="animate-spin h-4 w-4 rounded-full border-2 border-current border-t-transparent" />
+          <span>{children || "Chargement..."}</span>
+        </span>
+      ) : (
+        <>
+          {icon && <span className="shrink-0">{icon}</span>}
+          <span>{children}</span>
+          {iconRight && <span className="shrink-0">{iconRight}</span>}
+        </>
+      )}
     </motion.button>
   );
 }

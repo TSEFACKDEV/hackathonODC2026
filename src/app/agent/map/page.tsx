@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { motion, AnimatePresence } from "framer-motion";
-import { MdAdd, MdClose, MdMyLocation, MdSave, MdDelete } from "react-icons/md";
+import { MdAdd, MdClose, MdMyLocation, MdSave, MdDelete, MdMap, MdCheckCircle, MdInfo } from "react-icons/md";
 import api from "@/utils/api";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -59,7 +59,7 @@ export default function AgentMapPage() {
     <div className="space-y-4 h-full">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-2xl font-display font-bold text-gray-900">Carte des signalements 🗺️</h2>
+          <h2 className="text-2xl font-display font-bold text-gray-900 flex items-center gap-2"><MdMap size={24}/>Carte des signalements</h2>
           <p className="text-sm text-gray-500">{signals.length} signalement(s) en attente · {selectedPoints.length} point(s) sélectionné(s)</p>
         </div>
         <div className="flex gap-2">
@@ -75,7 +75,7 @@ export default function AgentMapPage() {
       {/* Instructions */}
       {selectedPoints.length === 0 && (
         <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} className="card p-4 bg-blue-50 border-blue-200">
-          <p className="text-sm text-blue-700 font-medium">💡 Cliquez sur les marqueurs rouges pour les sélectionner, puis créez un itinéraire optimisé.</p>
+          <p className="text-sm text-blue-700 font-medium"><MdInfo size={18} className="inline mr-2"/> Cliquez sur les marqueurs rouges pour les sélectionner, puis créez un itinéraire optimisé.</p>
         </motion.div>
       )}
 
@@ -92,7 +92,7 @@ export default function AgentMapPage() {
       <Modal open={showRouteModal} onClose={() => setShowRouteModal(false)} title="Créer un itinéraire de collecte" size="md">
         <form onSubmit={formik.handleSubmit} className="p-6 space-y-4">
           <div className="card p-4 bg-primary-50 border-primary-200">
-            <p className="text-sm font-semibold text-primary-700">✅ {selectedPoints.length} point(s) de collecte sélectionnés</p>
+            <p className="text-sm font-semibold text-primary-700"><MdCheckCircle className="inline mr-1" size={16}/>{selectedPoints.length} point(s) de collecte sélectionnés</p>
             <p className="text-xs text-primary-600 mt-1">L'algorithme optimisera automatiquement le parcours le plus court.</p>
           </div>
           <div>

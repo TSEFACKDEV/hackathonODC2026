@@ -1,90 +1,108 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyAccessToken } from "@/lib/jwt";
+import { jwtVerify } from "jose";
 
-// Routes totalement publiques (jamais de redirect)
-const PUBLIC_PAGES = ["/", "/tips", "/planning", "/activities", "/login", "/register", "/forgot-password", "/reset-password", "/verify-email"];
+const SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET ?? "ecotrack_super_secret_jwt_2025_change_en_production"
+);
 
-// Routes protégées admin
-const ADMIN_ROUTES = ["/admin"];
+// Pages accessibles sans connexion
+const PUBLIC_PAGES = [
+  "/",
+  "/tips",
+  "/planning",
+  "/activities",
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+  "/verify-email",
+];
 
-// Routes protégées agent
-const AGENT_ROUTES = ["/agent"];
-
-// Routes protégées user (requiert connexion)
+// Pages qui nécessitent d'être connecté
 const AUTH_REQUIRED = ["/signals", "/profile"];
 
-export function middleware(req: NextRequest) {
+// Pages réservées admin
+const ADMIN_PAGES = ["/admin"];
+
+// Pages réservées agent
+const AGENT_PAGES = ["/agent"];
+
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // ── Ignorer assets statiques ──────────────────────────────
+  // ── Ignorer assets statiques ─────────────────────────────
   if (
     pathname.startsWith("/_next") ||
+    pathname.startsWith("/favicon") ||
     pathname.startsWith("/images") ||
     pathname.startsWith("/uploads") ||
-    pathname.startsWith("/favicon") ||
     pathname.includes(".")
   ) {
     return NextResponse.next();
   }
 
-  // ── API : laisser passer, chaque handler gère son auth ───
+  // ── Laisser passer les API routes ────────────────────────
   if (pathname.startsWith("/api")) {
     return NextResponse.next();
   }
 
-  // ── Pages publiques ──────────────────────────────────────
-  const isPublicPage = PUBLIC_PAGES.some((p) => pathname === p);
-  if (isPublicPage) return NextResponse.next();
+  const isPublic = PUBLIC_PAGES.includes(pathname);
+  const needsAuth =
+    AUTH_REQUIRED.some((p) => pathname.startsWith(p)) ||
+    ADMIN_PAGES.some((p) => pathname.startsWith(p)) ||
+    AGENT_PAGES.some((p) => pathname.startsWith(p));
 
-  // ── Lire le token ────────────────────────────────────────
-  const token =
-    req.cookies.get("access_token")?.value ||
-    req.headers.get("authorization")?.replace("Bearer ", "");
+  // ── Lire le token JWT custom ─────────────────────────────
+  const token = req.cookies.get("access_token")?.value;
 
-  // ── Routes qui nécessitent une authentification ──────────
-  const needsAuth = AUTH_REQUIRED.some((p) => pathname.startsWith(p));
-  if (needsAuth && !token) {
-    const url = new URL("/login", req.url);
-    url.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(url);
-  }
-
-  // ── Vérifier le token si présent ─────────────────────────
-  if (token) {
-    try {
-      const user = verifyAccessToken(token);
-
-      // Admin routes → refuser si pas ADMIN
-      if (ADMIN_ROUTES.some((p) => pathname.startsWith(p))) {
-        if (user.role !== "ADMIN") {
-          return NextResponse.redirect(new URL("/", req.url));
-        }
-      }
-
-      // Agent routes → refuser si pas AGENT ou ADMIN
-      if (AGENT_ROUTES.some((p) => pathname.startsWith(p))) {
-        if (!["AGENT", "ADMIN"].includes(user.role)) {
-          return NextResponse.redirect(new URL("/", req.url));
-        }
-      }
-
-      return NextResponse.next();
-    } catch {
-      // Token invalide → rediriger vers login pour routes protégées
-      if (needsAuth || ADMIN_ROUTES.some((p) => pathname.startsWith(p))) {
-        const url = new URL("/login", req.url);
-        url.searchParams.set("redirect", pathname);
-        return NextResponse.redirect(url);
-      }
-      return NextResponse.next();
+  // ── Pas de token ─────────────────────────────────────────
+  if (!token) {
+    if (needsAuth) {
+      const url = new URL("/login", req.url);
+      url.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(url);
     }
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
+  // ── Vérifier le token avec jose (Edge compatible) ────────
+  try {
+    const { payload } = await jwtVerify(token, SECRET);
+    const role = payload.role as string;
+
+    // Déjà connecté → éviter login/register
+    if (pathname === "/login" || pathname === "/register") {
+      if (role === "ADMIN") return NextResponse.redirect(new URL("/admin", req.url));
+      if (role === "AGENT") return NextResponse.redirect(new URL("/agent", req.url));
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    // Vérification rôle admin
+    if (ADMIN_PAGES.some((p) => pathname.startsWith(p)) && role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    // Vérification rôle agent
+    if (
+      AGENT_PAGES.some((p) => pathname.startsWith(p)) &&
+      !["AGENT", "ADMIN"].includes(role)
+    ) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    return NextResponse.next();
+  } catch {
+    // Token expiré ou invalide
+    const res = needsAuth
+      ? NextResponse.redirect(new URL(`/login?redirect=${pathname}`, req.url))
+      : NextResponse.next();
+
+    // Supprimer le cookie corrompu
+    res.cookies.set("access_token", "", { maxAge: 0, path: "/" });
+    return res;
+  }
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|images|uploads).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|images|uploads).*)"],
 };

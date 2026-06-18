@@ -5,7 +5,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
-import { MdPerson, MdPhone, MdEdit, MdSave, MdClose, MdImage, MdStar, MdEco, MdReportProblem, MdSwapHoriz, MdEmojiEvents, MdPhoneAndroid, MdNature, MdCardGiftcard, MdAccessTime, MdCheckCircle, MdLocalShipping, MdLocationOn } from "react-icons/md";
+import { MdPerson, MdPhone, MdEdit, MdSave, MdClose, MdImage, MdStar, MdEco, MdReportProblem, MdSwapHoriz, MdEmojiEvents, MdPhoneAndroid, MdNature, MdCardGiftcard, MdAccessTime, MdCheckCircle, MdLocalShipping, MdLocationOn, MdTipsAndUpdates } from "react-icons/md";
 import { RootState } from "@/store";
 import { updateUser } from "@/store/slices/authSlice";
 import { useAuth } from "@/hooks/useAuth";
@@ -259,12 +259,12 @@ export default function ProfilePage() {
           {/* Comment gagner */}
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
-              { icon:"📍", action:"Signaler un dépôt", pts:"+10 pts" },
-              { icon:"🌱", action:"Activité approuvée", pts:"+10 à +50 pts" },
-              { icon:"♻️", action:"Lire une astuce", pts:"+2 pts" },
+              { icon:<MdLocationOn size={20}/>, action:"Signaler un dépôt", pts:"+10 pts" },
+              { icon:<MdLocalShipping size={20}/>, action:"Activité approuvée", pts:"+10 à +50 pts" },
+              { icon:<MdTipsAndUpdates size={20}/>, action:"Lire une astuce", pts:"+2 pts" },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                <span className="text-2xl">{item.icon}</span>
+                <span className="text-primary-600">{item.icon}</span>
                 <div>
                   <p className="text-xs font-semibold text-gray-700">{item.action}</p>
                   <p className="text-xs text-primary-600 font-bold">{item.pts}</p>

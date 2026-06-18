@@ -1,40 +1,58 @@
 "use client";
-
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
-import { MdEmail, MdLock, MdVisibility, MdVisibilityOff, MdEmojiPeople } from "react-icons/md";
+import { MdEmail, MdLock, MdVisibility, MdVisibilityOff } from "react-icons/md";
 import { setCredentials } from "@/store/slices/authSlice";
 import api from "@/utils/api";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 
 export default function LoginPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
   const [showPwd, setShowPwd] = useState(false);
-  const redirect = searchParams.get("redirect") || "/";
+
+  // Page de destination après connexion
+  const redirectTo = searchParams.get("redirect") || null;
 
   const formik = useFormik({
     initialValues: { email: "", password: "" },
     validationSchema: Yup.object({
       email: Yup.string().email("Email invalide").required("Email requis"),
-      password: Yup.string().min(6, "Minimum 6 caractères").required("Mot de passe requis"),
+      password: Yup.string()
+        .min(6, "Minimum 6 caractères")
+        .required("Mot de passe requis"),
     }),
     onSubmit: async (values) => {
       try {
         const res = await api.post("/auth/login", values);
-        dispatch(setCredentials(res.data.data));
-        toast.success(`Bienvenue, ${res.data.data.user.name.split(" ")[0]} !`);
-        const role = res.data.data.user.role;
-        if (role === "ADMIN") router.push("/admin");
-        else router.push(redirect);
+        const { user, token } = res.data.data;
+
+        // 1. Sauvegarder dans Redux + localStorage + cookie client
+        dispatch(setCredentials({ user, token }));
+
+        toast.success(`Bienvenue, ${user.name.split(" ")[0]} ! 🌿`);
+
+        // 2. Déterminer la destination
+        let destination: string;
+        if (redirectTo && redirectTo !== "/login" && redirectTo !== "/register") {
+          // Retourner là où l'utilisateur voulait aller
+          destination = redirectTo;
+        } else {
+          // Défaut selon le rôle
+          if (user.role === "ADMIN") destination = "/admin";
+          else if (user.role === "AGENT") destination = "/agent";
+          else destination = "/";
+        }
+
+        // 3. Rechargement complet pour que le middleware lise le cookie
+        window.location.href = destination;
       } catch (err: any) {
         toast.error(err.response?.data?.error || "Identifiants incorrects");
       }
@@ -42,41 +60,41 @@ export default function LoginPage() {
   });
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div className="mb-8 flex items-center gap-3">
-        <MdEmojiPeople size={32} className="text-primary-600" />
-        <div>
-          <h2 className="text-2xl md:text-3xl font-display font-bold text-gray-900">Bon retour !</h2>
-          <p className="text-gray-500 mt-1 text-sm">Connectez-vous à votre compte EcoTrack</p>
-        </div>
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+      <div className="mb-8">
+        <h2 className="text-3xl font-display font-bold text-gray-900">
+          Bon retour ! 👋
+        </h2>
+        <p className="text-gray-500 mt-1">
+          Connectez-vous à votre compte EcoTrack
+        </p>
       </div>
 
       <form onSubmit={formik.handleSubmit} className="space-y-4">
         <Input
-          label="Adresse email *"
+          label="Adresse email"
           type="email"
           placeholder="vous@exemple.cm"
-          leftIcon={<MdEmail size={18} className="text-gray-400" />}
+          leftIcon={<MdEmail size={18} />}
           {...formik.getFieldProps("email")}
           error={formik.touched.email ? formik.errors.email : ""}
         />
-
         <Input
-          label="Mot de passe *"
+          label="Mot de passe"
           type={showPwd ? "text" : "password"}
           placeholder="••••••••"
-          leftIcon={<MdLock size={18} className="text-gray-400" />}
+          leftIcon={<MdLock size={18} />}
           rightElement={
             <button
               type="button"
               onClick={() => setShowPwd(!showPwd)}
-              className="text-gray-400 hover:text-gray-600 p-1 transition-colors"
+              className="text-gray-400 hover:text-gray-600 p-1"
             >
-              {showPwd ? <MdVisibilityOff size={18} /> : <MdVisibility size={18} />}
+              {showPwd ? (
+                <MdVisibilityOff size={18} />
+              ) : (
+                <MdVisibility size={18} />
+              )}
             </button>
           }
           {...formik.getFieldProps("password")}
@@ -86,7 +104,7 @@ export default function LoginPage() {
         <div className="flex justify-end">
           <Link
             href="/forgot-password"
-            className="text-sm text-primary-600 hover:underline font-medium transition-colors"
+            className="text-sm text-primary-600 hover:underline font-medium"
           >
             Mot de passe oublié ?
           </Link>
@@ -97,7 +115,6 @@ export default function LoginPage() {
           fullWidth
           size="lg"
           loading={formik.isSubmitting}
-          className="mt-2"
         >
           Se connecter
         </Button>
@@ -108,15 +125,15 @@ export default function LoginPage() {
           <div className="w-full border-t border-gray-200" />
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-white px-4 text-xs text-gray-400">
+          <span className="bg-gray-50 px-4 text-xs text-gray-400">
             Nouveau sur EcoTrack ?
           </span>
         </div>
       </div>
 
-      <Link href="/register" className="block">
-        <Button variant="secondary" fullWidth size="lg">
-          Créer un compte gratuit
+      <Link href="/register">
+        <Button variant="secondary" fullWidth>
+          Créer un compte gratuit 🌱
         </Button>
       </Link>
     </motion.div>

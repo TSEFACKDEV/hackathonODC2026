@@ -36,7 +36,7 @@ function Sidebar({ mobile=false, onClose }: { mobile?: boolean; onClose?: ()=>vo
       <div className="p-5 border-b border-primary-800 flex items-center justify-between">
         <Link href="/admin" className="flex items-center gap-3" onClick={onClose}>
           <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center">
-            <span className="text-lg">🌿</span>
+            <MdEco size={20} />
           </div>
           <div>
             <p className="font-display font-bold text-white">EcoTrack</p>

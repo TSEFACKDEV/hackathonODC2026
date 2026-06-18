@@ -25,11 +25,16 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [profileMenu, setProfileMenu] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", fn);
     return () => window.removeEventListener("scroll", fn);
+  }, []);
+
+  useEffect(() => {
+    setMounted(true);
   }, []);
 
   useEffect(() => { setOpen(false); setProfileMenu(false); }, [pathname]);
@@ -61,7 +66,7 @@ export default function Header() {
 
           {/* Auth */}
           <div className="flex items-center gap-2">
-            {user ? (
+            {mounted && user ? (
               <div className="relative">
                 <motion.button
                   whileTap={{ scale: 0.95 }}
@@ -105,8 +110,8 @@ export default function Header() {
               </div>
             ) : (
               <div className="hidden md:flex items-center gap-2">
-                <Link href="/login"><button className="btn-sm btn-ghost text-gray-600">Connexion</button></Link>
-                <Link href="/register"><button className="btn-sm btn-primary">S'inscrire</button></Link>
+                <Link href="/login" className="btn-sm btn-ghost text-gray-600">Connexion</Link>
+                <Link href="/register" className="btn-sm btn-primary">S'inscrire</Link>
               </div>
             )}
 
