@@ -8,7 +8,7 @@ import { RootState } from "@/store";
 import { logout } from "@/store/slices/authSlice";
 import {
   MdDashboard, MdReportProblem, MdCalendarToday, MdTipsAndUpdates,
-  MdEco, MdPerson, MdLogout, MdMap,
+  MdEco, MdPerson, MdLogout, MdMap, MdHelp,
 } from "react-icons/md";
 
 const navItems = [
@@ -17,6 +17,7 @@ const navItems = [
   { href: "/schedule", label: "Planning collecte", icon: <MdCalendarToday size={22} /> },
   { href: "/tips", label: "Astuces & Recyclage", icon: <MdTipsAndUpdates size={22} /> },
   { href: "/activities", label: "Activités éco", icon: <MdEco size={22} /> },
+  { href: "/faq", label: "FAQ", icon: <MdHelp size={22} /> },
   { href: "/profile", label: "Mon profil", icon: <MdPerson size={22} /> },
 ];
 

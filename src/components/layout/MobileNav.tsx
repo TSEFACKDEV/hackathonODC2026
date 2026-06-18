@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { MdDashboard, MdReportProblem, MdCalendarToday, MdEco, MdPerson } from "react-icons/md";
+import { MdDashboard, MdReportProblem, MdHelp, MdEco, MdPerson } from "react-icons/md";
 
 const navItems = [
   { href: "/dashboard", label: "Accueil", icon: <MdDashboard size={24} /> },
   { href: "/signals", label: "Signaler", icon: <MdReportProblem size={24} /> },
-  { href: "/schedule", label: "Planning", icon: <MdCalendarToday size={24} /> },
+  { href: "/faq", label: "FAQ", icon: <MdHelp size={24} /> },
   { href: "/activities", label: "Activités", icon: <MdEco size={24} /> },
   { href: "/profile", label: "Profil", icon: <MdPerson size={24} /> },
 ];
