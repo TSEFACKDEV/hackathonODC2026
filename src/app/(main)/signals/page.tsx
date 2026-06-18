@@ -79,12 +79,15 @@ interface AddressResult {
   display_name: string;
 }
 
+// Interface corrigée pour correspondre à la réponse de l'API
 interface UploadResponse {
   data: {
-    data: {
-      url: string;
-    };
+    url: string;
   };
+}
+
+interface ApiResponse<T> {
+  data: T;
 }
 
 export default function SignalsPage() {
@@ -229,6 +232,7 @@ export default function SignalsPage() {
             formData.append("file", file);
             formData.append("folder", "signals");
 
+            // Correction: accès direct à response.data.url
             const response = await api.post<UploadResponse>("/upload", formData, {
               headers: {
                 "Content-Type": "multipart/form-data",
@@ -241,7 +245,7 @@ export default function SignalsPage() {
 
         setUploading(false);
 
-        const response = await api.post("/signals", {
+        const response = await api.post<ApiResponse<Signal>>("/signals", {
           ...values,
           imageUrl: imageUrls[0],
           imageUrls: imageUrls,
@@ -265,9 +269,10 @@ export default function SignalsPage() {
     },
   });
 
+  // Correction: Typage explicite de statusConfig avec React.ReactNode
   const statusConfig: Record<
     string,
-    { label: string; color: string; icon: JSX.Element }
+    { label: string; color: string; icon: React.ReactNode }
   > = {
     PENDING: {
       label: "En attente",
@@ -302,7 +307,12 @@ export default function SignalsPage() {
   };
 
   const getSeverityIcon = (severity: number) => {
-    const icons = [null, <MdInfo />, <MdWarning />, <MdError />];
+    const icons: Record<number, React.ReactNode> = {
+      0: null,
+      1: <MdInfo />,
+      2: <MdWarning />,
+      3: <MdError />,
+    };
     return icons[severity] || <MdInfo />;
   };
 
@@ -450,7 +460,7 @@ export default function SignalsPage() {
         </div>
       </div>
 
-      {/* Modal Signalement - CORRIGÉ */}
+      {/* Modal Signalement */}
       <Modal
         open={showForm}
         onClose={() => setShowForm(false)}

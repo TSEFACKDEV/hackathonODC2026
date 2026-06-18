@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MdExpandMore, MdSearch, MdHelpOutline, MdMap, MdAutorenew, MdEmojiEvents, MdPerson, MdPhoneAndroid, MdChat } from "react-icons/md";
-import Input from "@/components/ui/Input";
+import { 
+  MdExpandMore, MdSearch, MdHelpOutline, MdMap, 
+  MdAutorenew, MdEmojiEvents, MdPerson, MdPhoneAndroid, MdChat 
+} from "react-icons/md";
 
 const faqs = [
   {
     category: "Signalements",
-    icon: <MdMap />,
+    icon: <MdMap size={20} />,
     questions: [
       {
         q: "Comment signaler un dépôt sauvage ?",
@@ -26,7 +28,7 @@ const faqs = [
   },
   {
     category: "Activités & Recyclage",
-    icon: <MdAutorenew />,
+    icon: <MdAutorenew size={20} />,
     questions: [
       {
         q: "Quelles activités écologiques peuvent rapporter des points ?",
@@ -44,7 +46,7 @@ const faqs = [
   },
   {
     category: "Points & Récompenses",
-    icon: <MdEmojiEvents />,
+    icon: <MdEmojiEvents size={20} />,
     questions: [
       {
         q: "Comment sont calculés mes points ?",
@@ -62,7 +64,7 @@ const faqs = [
   },
   {
     category: "Compte & Sécurité",
-    icon: <MdPerson />,
+    icon: <MdPerson size={20} />,
     questions: [
       {
         q: "Comment modifier mon profil ?",
@@ -80,7 +82,7 @@ const faqs = [
   },
   {
     category: "Application",
-    icon: <MdPhoneAndroid />,
+    icon: <MdPhoneAndroid size={20} />,
     questions: [
       {
         q: "EcoTrack est-il disponible hors ligne ?",
@@ -118,138 +120,181 @@ export default function FAQPage() {
     });
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="container-custom max-w-5xl py-8 space-y-8 font-sans">
+      
+      {/* Header avec gradient global et structure responsive */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="gradient-green rounded-2xl p-6 text-white relative overflow-hidden"
+        className="gradient-primary rounded-2xl p-8 text-white relative overflow-hidden shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6"
       >
-        <MdHelpOutline className="absolute top-0 right-0 opacity-10 text-[10rem] leading-none" />
-        <h1 className="text-2xl font-display font-bold">Foire aux Questions</h1>
-        <p className="text-white/80 mt-1">
-          Trouvez rapidement des réponses à vos questions sur EcoTrack.
-        </p>
+        <div className="relative z-10 space-y-2 max-w-xl">
+          <span className="bg-white/20 text-white text-xs font-bold tracking-wider uppercase px-3 py-1 rounded-full backdrop-blur-sm">
+            Centre d'aide
+          </span>
+          <h1 className="text-3xl md:text-4xl font-display font-bold tracking-tight">
+            Comment pouvons-nous vous aider ?
+          </h1>
+          <p className="text-emerald-100/90 text-sm md:text-base font-medium">
+            Trouvez rapidement des réponses à vos questions sur l'écosystème EcoTrack.
+          </p>
+        </div>
+        <div className="absolute -bottom-6 -right-6 text-white/5 pointer-events-none hidden md:block">
+          <MdHelpOutline size={220} />
+        </div>
       </motion.div>
 
-      {/* Recherche */}
-      <Input
-        placeholder="Rechercher une question..."
-        leftIcon={<MdSearch size={18} />}
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setActiveCategory(null);
-        }}
-      />
+      {/* Barre de Recherche épurée */}
+      <div className="relative shadow-sm rounded-xl overflow-hidden group">
+        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary-600 transition-colors">
+          <MdSearch size={22} />
+        </div>
+        <input
+          type="text"
+          placeholder="Rechercher un mot-clé, une fonctionnalité, une règle..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setActiveCategory(null);
+          }}
+          className="input pl-12 pr-4 py-4 border-gray-200 bg-white font-medium text-gray-800 placeholder-gray-400 focus:border-primary-500 focus:ring-4 focus:ring-primary-100"
+        />
+      </div>
 
-      {/* Filtres par catégorie */}
-      {!search && (
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setActiveCategory(null)}
-            className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all border-2 ${
-              !activeCategory
-                ? "bg-primary-600 text-white border-primary-600"
-                : "bg-white text-gray-600 border-gray-200 hover:border-primary-300"
-            }`}
-          >
-            Tout
-          </button>
-          {faqs.map((cat) => (
+      {/* Layout Principal : Split Screen sur Desktop (Filtres à gauche, FAQ à droite) */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+        
+        {/* Navigation par catégories (Sidebar sur grand écran) */}
+        {!search && (
+          <div className="lg:col-span-1 lg:sticky lg:top-6 flex flex-row lg:flex-col gap-2 overflow-x-auto pb-3 lg:pb-0 scrollbar-none snap-x">
             <button
-              key={cat.category}
-              onClick={() => setActiveCategory(cat.category)}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all border-2 ${
-                activeCategory === cat.category
-                  ? "bg-primary-600 text-white border-primary-600"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-primary-300"
+              onClick={() => setActiveCategory(null)}
+              className={`px-4 py-3 rounded-xl text-xs md:text-sm font-bold transition-all whitespace-nowrap shrink-0 snap-center flex items-center justify-center lg:justify-start gap-3 border ${
+                !activeCategory
+                  ? "bg-primary-600 text-white border-primary-600 shadow-sm shadow-primary-200"
+                  : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-gray-900"
               }`}
             >
-              {cat.icon} {cat.category}
+              <span className="w-5 h-5 rounded-lg bg-current/10 flex items-center justify-center">🚀</span>
+              Tout voir
             </button>
-          ))}
-        </div>
-      )}
+            {faqs.map((cat) => (
+              <button
+                key={cat.category}
+                onClick={() => setActiveCategory(cat.category)}
+                className={`px-4 py-3 rounded-xl text-xs md:text-sm font-bold transition-all whitespace-nowrap shrink-0 snap-center flex items-center lg:justify-start gap-3 border ${
+                  activeCategory === cat.category
+                    ? "bg-primary-600 text-white border-primary-600 shadow-sm shadow-primary-200"
+                    : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-gray-900"
+                }`}
+              >
+                <span className="shrink-0">{cat.icon}</span>
+                {cat.category}
+              </button>
+            ))}
+          </div>
+        )}
 
-      {/* Questions */}
-      {filtered.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-16 text-gray-400"
-        >
-          <div className="text-5xl mb-4"><MdSearch size={56} /></div>
-          <p className="font-semibold text-gray-500">Aucune question trouvée</p>
-          <p className="text-sm mt-1">Essayez avec d'autres mots-clés</p>
-        </motion.div>
-      ) : (
-        <div className="space-y-6">
-          {filtered.map((cat) => (
-            <div key={cat.category}>
-              <h2 className="text-base font-display font-bold text-gray-700 mb-3 flex items-center gap-2">
-                <span>{cat.icon}</span> {cat.category}
-              </h2>
-              <div className="space-y-2">
-                {cat.questions.map((item, i) => {
-                  const key = `${cat.category}-${i}`;
-                  const isOpen = openIndex === key;
-                  return (
-                    <motion.div
-                      key={key}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                      className="card p-0 overflow-hidden"
-                    >
-                      <button
-                        onClick={() => toggle(key)}
-                        className="w-full flex items-center justify-between gap-4 p-4 text-left"
-                      >
-                        <span className="font-semibold text-gray-800 text-sm">{item.q}</span>
-                        <motion.span
-                          animate={{ rotate: isOpen ? 180 : 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="text-primary-600 shrink-0"
-                        >
-                          <MdExpandMore size={22} />
-                        </motion.span>
-                      </button>
-                      <AnimatePresence initial={false}>
-                        {isOpen && (
-                          <motion.div
-                            key="content"
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.25, ease: "easeInOut" }}
-                            className="overflow-hidden"
-                          >
-                            <p className="px-4 pb-4 text-sm text-gray-500 leading-relaxed border-t border-gray-100 pt-3">
-                              {item.a}
-                            </p>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </motion.div>
-                  );
-                })}
+        {/* Section des questions-réponses */}
+        <div className={`space-y-8 ${search ? "lg:col-span-4" : "lg:col-span-3"}`}>
+          {filtered.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-16 bg-white rounded-2xl border border-gray-100 p-8"
+            >
+              <div className="inline-flex p-4 rounded-full bg-gray-50 text-gray-400 mb-4">
+                <MdSearch size={40} />
               </div>
+              <p className="font-display font-bold text-gray-700 text-lg">Aucun résultat trouvé</p>
+              <p className="text-sm text-gray-400 mt-1 max-w-xs mx-auto">
+                Nous n'avons trouvé aucune réponse pour « <span className="font-semibold text-gray-600">{search}</span> ».
+              </p>
+            </motion.div>
+          ) : (
+            <div className="space-y-8">
+              {filtered.map((cat) => (
+                <div key={cat.category} className="space-y-4">
+                  <h2 className="text-sm font-display font-bold tracking-wider text-gray-400 uppercase flex items-center gap-2 pl-1">
+                    {cat.icon} {cat.category}
+                  </h2>
+                  <div className="space-y-3">
+                    {cat.questions.map((item, i) => {
+                      const key = `${cat.category}-${i}`;
+                      const isOpen = openIndex === key;
+                      return (
+                        <motion.div
+                          key={key}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.03 }}
+                          className="card card-hover overflow-hidden border-gray-100"
+                        >
+                          <button
+                            onClick={() => toggle(key)}
+                            className="w-full flex items-center justify-between gap-4 p-5 text-left transition-colors hover:bg-gray-50/50"
+                          >
+                            <span className="font-semibold text-gray-800 text-sm md:text-base">
+                              {item.q}
+                            </span>
+                            <motion.span
+                              animate={{ rotate: isOpen ? 180 : 0 }}
+                              transition={{ duration: 0.2, ease: "easeInOut" }}
+                              className={`shrink-0 p-1.5 rounded-lg ${
+                                isOpen ? "bg-primary-100 text-primary-700" : "bg-gray-100 text-gray-500"
+                              }`}
+                            >
+                              <MdExpandMore size={20} />
+                            </motion.span>
+                          </button>
+                          
+                          <AnimatePresence initial={false}>
+                            {isOpen && (
+                              <motion.div
+                                key="content"
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.2, ease: "easeInOut" }}
+                                className="overflow-hidden bg-gray-50/50"
+                              >
+                                <p className="px-5 pb-5 text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-4">
+                                  {item.a}
+                                </p>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
-      )}
+      </div>
 
-      {/* Contact support */}
-      <div className="card bg-gradient-to-r from-primary-50 to-emerald-50 border-primary-200 text-center">
-        <p className="text-2xl mb-2"><MdChat size={36} /></p>
-        <h3 className="font-display font-bold text-gray-800">Vous n'avez pas trouvé votre réponse ?</h3>
-        <p className="text-sm text-gray-500 mt-1 mb-4">
-          Notre équipe est disponible pour vous aider.
-        </p>
-        <a href="mailto:support@ecotrack.cm">
-          <button className="btn-primary px-6 py-2 text-sm">Contacter le support</button>
-        </a>
+      {/* Footer Support d'aide call-to-action */}
+      <div className="card bg-gradient-to-br from-primary-50 to-secondary-50/60 border-primary-100 p-8 text-center space-y-4 max-w-2xl mx-auto mt-12 relative overflow-hidden">
+        <div className="w-12 h-12 bg-white rounded-2xl shadow-sm border border-primary-100 flex items-center justify-center mx-auto text-primary-600">
+          <MdChat size={24} />
+        </div>
+        <div className="space-y-1 relative z-10">
+          <h3 className="font-display font-bold text-gray-800 text-lg">
+            Toujours bloqué ? Une question spécifique ?
+          </h3>
+          <p className="text-sm text-gray-500 max-w-sm mx-auto">
+            Pas d'inquiétude, l'équipe de support EcoTrack est à vos côtés et vous répond en moins de 24 heures.
+          </p>
+        </div>
+        <div className="pt-2">
+          <a href="mailto:support@ecotrack.cm" className="inline-block">
+            <button className="btn btn-primary btn-md shadow-sm">
+              Contacter l'équipe support
+            </button>
+          </a>
+        </div>
       </div>
     </div>
   );
