@@ -1,16 +1,17 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser, requireAuth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
+    const limit = Math.min(100, parseInt(searchParams.get("limit") || "10"));
     const status = searchParams.get("status");
     const skip = (page - 1) * limit;
 
-    const where = status ? { status: status as any } : {};
+    const where: any = {};
+    if (status && status !== "ALL") where.status = status;
 
     const [signals, total] = await Promise.all([
       prisma.signal.findMany({
@@ -23,12 +24,9 @@ export async function GET(req: NextRequest) {
       prisma.signal.count({ where }),
     ]);
 
-    return Response.json({
-      data: signals,
-      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
-    });
-
+    return Response.json({ data: signals, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
   } catch (error) {
+    console.error(error);
     return Response.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -38,7 +36,7 @@ export const POST = requireAuth(async (req, user) => {
     const body = await req.json();
     const { description, imageUrl, latitude, longitude, address, severity } = body;
 
-    if (!description || !imageUrl || !latitude || !longitude) {
+    if (!description || !imageUrl || latitude == null || longitude == null) {
       return Response.json({ error: "Champs requis manquants" }, { status: 400 });
     }
 
@@ -47,35 +45,37 @@ export const POST = requireAuth(async (req, user) => {
         userId: user.userId,
         description,
         imageUrl,
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
-        address,
-        severity: severity || 1,
+        latitude: parseFloat(String(latitude)),
+        longitude: parseFloat(String(longitude)),
+        address: address || null,
+        severity: parseInt(String(severity)) || 2,
       },
       include: { user: { select: { id: true, name: true, avatar: true } } },
     });
 
-    // Ajouter des points pour le signalement
+    // +10 points
     await prisma.user.update({
       where: { id: user.userId },
       data: { points: { increment: 10 }, totalPoints: { increment: 10 } },
     });
 
-    // Notifier les admins
-    const admins = await prisma.user.findMany({ where: { role: "ADMIN" } });
-    await prisma.notification.createMany({
-      data: admins.map((admin) => ({
-        userId: admin.id,
-        title: "Nouveau signalement",
-        message: `${user.email} a signalé un dépôt d'ordures`,
-        type: "signal",
-        link: `/admin/signals/${signal.id}`,
-      })),
-    });
+    // Notification admins
+    const admins = await prisma.user.findMany({ where: { role: "ADMIN" }, select: { id: true } });
+    if (admins.length) {
+      await prisma.notification.createMany({
+        data: admins.map((a) => ({
+          userId: a.id,
+          title: "📍 Nouveau signalement",
+          message: `Un dépôt a été signalé — Gravité : ${["","Faible","Moyen","Grave"][severity] || "?"}`,
+          type: "signal",
+          link: `/admin/signals`,
+        })),
+      });
+    }
 
-    return Response.json({ data: signal, message: "Signalement créé (+10 points)" }, { status: 201 });
-
+    return Response.json({ data: signal, message: "Signalement créé ! +10 points 🌿" }, { status: 201 });
   } catch (error) {
+    console.error(error);
     return Response.json({ error: "Erreur serveur" }, { status: 500 });
   }
 });

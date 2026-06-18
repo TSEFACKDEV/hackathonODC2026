@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { RootState } from "@/store";
 import api from "@/utils/api";
 import StatCard from "@/components/ui/StatCard";
-import { MdReportProblem, MdEco, MdStar, MdTipsAndUpdates } from "react-icons/md";
+import { MdReportProblem, MdEco, MdStar, MdTipsAndUpdates, MdPlace, MdCalendarToday} from "react-icons/md";
 import { Metadata } from "next";
 
 interface Stats {
@@ -57,7 +57,7 @@ export default function DashboardPage() {
       >
         <div className="absolute top-0 right-0 opacity-10 text-[10rem] leading-none">🌿</div>
         <h1 className="text-2xl font-display font-bold">
-          {greetingTime()}, {user?.name?.split(" ")[0]} ! 👋
+          {greetingTime()}, {user?.name?.split(" ")[0]} !
         </h1>
         <p className="text-white/80 mt-1">Continuez à contribuer pour des villes plus propres.</p>
         <div className="flex items-center gap-4 mt-4">
@@ -112,7 +112,7 @@ export default function DashboardPage() {
       <div className="card bg-gradient-to-r from-primary-50 to-emerald-50 border-primary-200">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h3 className="font-display font-bold text-gray-800">🎁 Convertir vos points en crédits</h3>
+            <h3 className="font-display font-bold text-gray-800">Convertir vos points en crédits</h3>
             <p className="text-sm text-gray-500 mt-1">100 points = 1 crédit de communication</p>
           </div>
           <div className="text-right">

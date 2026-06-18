@@ -1,49 +1,33 @@
 "use client";
+import { InputHTMLAttributes, ReactNode, forwardRef } from "react";
+import { MdWarning } from "react-icons/md";
 
-import { InputHTMLAttributes, ReactNode } from "react";
-
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface Props extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
-  icon?: ReactNode;
-  rightIcon?: ReactNode;
+  hint?: string;
+  leftIcon?: ReactNode;
+  rightElement?: ReactNode;
+  wrapperClass?: string;
 }
 
-export default function Input({ label, error, icon, rightIcon, className = "", ...props }: InputProps) {
-  return (
-    <div className="w-full">
-      {label && (
-        <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-          {label}
-        </label>
-      )}
+const Input = forwardRef<HTMLInputElement, Props>(
+  ({ label, error, hint, leftIcon, rightElement, wrapperClass="", className="", ...rest }, ref) => (
+    <div className={`w-full ${wrapperClass}`}>
+      {label && <label className="block text-sm font-semibold text-gray-700 mb-1.5">{label}</label>}
       <div className="relative">
-        {icon && (
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
-            {icon}
-          </span>
-        )}
+        {leftIcon && <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">{leftIcon}</span>}
         <input
-          className={`
-            input-field
-            ${icon ? "pl-10" : ""}
-            ${rightIcon ? "pr-10" : ""}
-            ${error ? "input-error" : ""}
-            ${className}
-          `}
-          {...props}
+          ref={ref}
+          className={`input ${leftIcon?"pl-10":""} ${rightElement?"pr-12":""} ${error?"input-error":""} ${className}`}
+          {...rest}
         />
-        {rightIcon && (
-          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer">
-            {rightIcon}
-          </span>
-        )}
+        {rightElement && <span className="absolute right-3 top-1/2 -translate-y-1/2">{rightElement}</span>}
       </div>
-      {error && (
-        <p className="mt-1.5 text-sm text-red-500 flex items-center gap-1">
-          <span>⚠️</span> {error}
-        </p>
-      )}
+      {error && <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1"><MdWarning size={14}/>{error}</p>}
+      {hint && !error && <p className="mt-1.5 text-xs text-gray-400">{hint}</p>}
     </div>
-  );
-}
+  )
+);
+Input.displayName = "Input";
+export default Input;

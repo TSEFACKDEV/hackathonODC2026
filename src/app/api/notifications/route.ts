@@ -7,7 +7,7 @@ export const GET = requireAuth(async (req, user) => {
     const notifications = await prisma.notification.findMany({
       where: { userId: user.userId },
       orderBy: { createdAt: "desc" },
-      take: 20,
+      take: 30,
     });
     return Response.json({ data: notifications });
   } catch {
@@ -21,7 +21,7 @@ export const PATCH = requireAuth(async (req, user) => {
       where: { userId: user.userId, isRead: false },
       data: { isRead: true },
     });
-    return Response.json({ message: "Notifications marquées comme lues" });
+    return Response.json({ message: "Toutes les notifications marquées comme lues" });
   } catch {
     return Response.json({ error: "Erreur serveur" }, { status: 500 });
   }

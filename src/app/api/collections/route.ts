@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");
     const where: any = {};
-    if (status) where.status = status;
+    if (status && status !== "ALL") where.status = status;
 
     const collections = await prisma.collection.findMany({
       where,
@@ -19,8 +19,7 @@ export async function GET(req: NextRequest) {
     });
 
     return Response.json({ data: collections });
-
-  } catch (error) {
+  } catch {
     return Response.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -34,78 +33,69 @@ export const POST = requireRole(["AGENT", "ADMIN"], async (req, user) => {
       return Response.json({ error: "Champs requis manquants" }, { status: 400 });
     }
 
-    // Algorithme TSP simplifié : nearest neighbor
-    const optimizedPoints = optimizeRoute(routePoints);
-
-    // Calcul distance et CO2
-    const distance = calculateTotalDistance(optimizedPoints);
-    const carbonSaved = distance * 0.21; // 210g CO2/km pour camion diesel
+    const optimized = optimizeRoute(routePoints);
+    const distance = calcDistance(optimized);
+    const carbonSaved = parseFloat((distance * 0.21).toFixed(2));
 
     const collection = await prisma.collection.create({
       data: {
         agentId: user.userId,
         title,
-        description,
+        description: description || null,
         date: new Date(date),
         distance,
         carbonSaved,
         points: {
-          create: optimizedPoints.map((p: any, i: number) => ({
-            latitude: p.latitude,
-            longitude: p.longitude,
-            address: p.address,
-            signalId: p.signalId,
+          create: optimized.map((p: any, i: number) => ({
+            latitude: parseFloat(String(p.latitude)),
+            longitude: parseFloat(String(p.longitude)),
+            address: p.address || null,
+            signalId: p.signalId || null,
             order: i + 1,
           })),
         },
       },
-      include: { points: true },
+      include: {
+        agent: { select: { id: true, name: true } },
+        points: { orderBy: { order: "asc" } },
+      },
     });
 
-    return Response.json({ data: collection, message: "Itinéraire créé" }, { status: 201 });
-
-  } catch (error) {
+    return Response.json({ data: collection, message: "Itinéraire créé ✅" }, { status: 201 });
+  } catch (err) {
+    console.error(err);
     return Response.json({ error: "Erreur serveur" }, { status: 500 });
   }
 });
 
-// Algorithme nearest neighbor pour TSP
-function optimizeRoute(points: any[]) {
-  if (points.length <= 2) return points;
-
-  const visited = new Array(points.length).fill(false);
-  const result = [points[0]];
-  visited[0] = true;
-
-  for (let i = 1; i < points.length; i++) {
+// Nearest Neighbor TSP
+function optimizeRoute(pts: any[]) {
+  if (pts.length <= 2) return pts;
+  const visited = new Set<number>();
+  const result = [pts[0]];
+  visited.add(0);
+  for (let i = 1; i < pts.length; i++) {
     const last = result[result.length - 1];
-    let nearest = -1, minDist = Infinity;
-
-    for (let j = 0; j < points.length; j++) {
-      if (!visited[j]) {
-        const d = haversineDistance(last.latitude, last.longitude, points[j].latitude, points[j].longitude);
-        if (d < minDist) { minDist = d; nearest = j; }
+    let best = -1, bestD = Infinity;
+    pts.forEach((p, j) => {
+      if (!visited.has(j)) {
+        const d = haversine(last.latitude, last.longitude, p.latitude, p.longitude);
+        if (d < bestD) { bestD = d; best = j; }
       }
-    }
-
-    if (nearest !== -1) { result.push(points[nearest]); visited[nearest] = true; }
+    });
+    if (best !== -1) { result.push(pts[best]); visited.add(best); }
   }
-
   return result;
 }
 
-function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLng = (lng2 - lng1) * Math.PI / 180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+function haversine(lat1: number, lng1: number, lat2: number, lng2: number) {
+  const R = 6371, dLat = (lat2 - lat1) * Math.PI / 180, dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-function calculateTotalDistance(points: any[]): number {
-  let total = 0;
-  for (let i = 0; i < points.length - 1; i++) {
-    total += haversineDistance(points[i].latitude, points[i].longitude, points[i+1].latitude, points[i+1].longitude);
-  }
-  return Math.round(total * 100) / 100;
+function calcDistance(pts: any[]) {
+  let d = 0;
+  for (let i = 0; i < pts.length - 1; i++) d += haversine(pts[i].latitude, pts[i].longitude, pts[i + 1].latitude, pts[i + 1].longitude);
+  return parseFloat(d.toFixed(2));
 }
